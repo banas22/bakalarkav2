@@ -1,10 +1,9 @@
 import math
 import tkinter as tk
+
 from contextlib import nullcontext
 from idlelib.browser import file_open
-from tkinter import filedialog, ttk, messagebox, Label
-from tkinter import ttk
-import csv
+from tkinter import ttk, messagebox, Label
 from tokenize import String
 import numpy as np
 import cmath
@@ -18,7 +17,6 @@ from tkinter import *
 from tkinter.ttk import *
 from time import strftime
 import pandas as pd
-from numpy import fft
 from pandas import read_csv
 import fft_alg
 
@@ -127,31 +125,35 @@ class DataApp:
     def import_file_dialogwindow(self):
         filepath = filedialog.askopenfilename(filetypes=[("CSV Files", "*.csv")])
         file = open(filepath, "r")
-        #print(file.read())
         self.data = pd.read_csv(file, header=None)
         #self.data = self.data.values.flatten()
         self.update_plots()
 
 
     # ulozi subor ako .csv
-    def save_file_dialogwindow(self):
-        filepath = filedialog.asksaveasfilename(defaultextension=".csv")
-        if filepath and self.data is not None:
-            self.data.to_csv(filepath, index=False)
+    def save_spectrum_dialogwindow(self):
+        if not hasattr(self, 'spectrum_data') or self.spectrum_data is None:
+            messagebox.showwarning("Varovanie", "Najprv musíte spustiť výpočet FFT!")
+            return
 
-    '''def select_algorithm(self, sel):
-        try:
-            if (sel == 0): # Cooley-Tukey
-                if(math.log2())'''
+        filepath = filedialog.asksaveasfilename(
+            defaultextension=".csv",
+            filetypes=[("CSV Files", "*.csv")],
+            title="Uložiť frekvenčné spektrum"
+        )
 
+        if filepath:
+            # Uložíme s hlavičkou, aby sme vedeli, čo je čo
+            self.spectrum_data.to_csv(filepath, index=False)
+            messagebox.showinfo("Úspech", "Frekvenčné spektrum bolo uložené.")
 
     #konstruktor
     def __init__(self, root): #hlavne okno
         # vlastnosti okna
         self.insm_window = None
         self.cal_window = None
-        self.window_width = 1500 #width = sirka
-        self.window_height = 800 #height = vyska
+        self.window_width = 1000 #width = sirka
+        self.window_height = 600 #height = vyska
         self.root = root
         self.root.title("Vypocet FFT")
         self.root.geometry(str(self.window_width)+"x"+str(self.window_height))
@@ -171,10 +173,10 @@ class DataApp:
         #
 
         #horny a dolny ramec
-        self.frame_height = self.window_height/2
+        self.frame_height = self.window_height//2
         top_frame = tk.Frame(self.root, width=self.window_width, height=self.frame_height, padx=10, pady=10, bg="lightblue")
         top_frame.place(x=0,y=0)
-        bottom_frame = tk.Frame(self.root, width=self.window_width, height=self.frame_height, padx=10, pady=10, bg="red")
+        bottom_frame = tk.Frame(self.root, width=self.window_width, height=self.frame_height, padx=0, pady=0, bg="red")
         bottom_frame.place(x=0,y=self.frame_height)
         #
 
@@ -184,15 +186,13 @@ class DataApp:
         label_radio.config(font=("Times New Roman", 10))
 
         # Vyber FFT algoritmu
-        self.select = tk.StringVar()
-        radio_btn = tk.Radiobutton(top_frame, variable = self.select, text="Cooley-Tukey", value=0, bg="lightblue")
-        radio_btn.place(x=20, y=50)
-        radio_btn.select()
-        radio_btn = tk.Radiobutton(top_frame, variable = self.select, text="Prime Factor", value=1, bg="lightblue")
-        radio_btn.place(x=20, y=80)
-        radio_btn = tk.Radiobutton(top_frame, variable = self.select, text="Split Radix", value=2, bg="lightblue")
-        radio_btn.place(x=20, y=110)
-        sel = tk.IntVar(radio_btn)
+        self.sel = tk.IntVar(value=0)  # Jedna premenná pre Radiobuttony
+        radio_btn1 = tk.Radiobutton(top_frame, variable=self.sel, text="Cooley-Tukey", value=0, bg="lightblue")
+        radio_btn1.place(x=20, y=50)
+        radio_btn2 = tk.Radiobutton(top_frame, variable=self.sel, text="Prime Factor", value=1, bg="lightblue")
+        radio_btn2.place(x=20, y=80)
+        radio_btn3 = tk.Radiobutton(top_frame, variable=self.sel, text="Split Radix", value=2, bg="lightblue")
+        radio_btn3.place(x=20, y=110)
         # zobrazenie metrik
         self.cas_popis = Label(top_frame, text="Cas programu:")
         self.cas_popis.place(x=10, y=200)
@@ -205,7 +205,7 @@ class DataApp:
 
         # button spustenie vybraneho algoritmu
         btn_inst = tk.Button(top_frame, text="Spustit", command=self.update_plots)
-        btn_inst.place(x=20, y=140)#, command=self.select_algorithm(sel))
+        btn_inst.place(x=20, y=140)
 
         # ramec pre import/export buttony
         self.io_frame_width = 300
@@ -215,10 +215,10 @@ class DataApp:
 
         #bottom frame
         #buttom_frame = tk.Frame(self.root, padx=10, pady=10, bg="darkblue")
-        self.left_bottom_frame = tk.Frame(bottom_frame, width=self.window_width/2, height=self.window_height/2)
+        self.left_bottom_frame = tk.Frame(bottom_frame, width=self.window_width/2, height=self.window_height/2, padx=10, pady=10)
         self.left_bottom_frame.place(x=0,y=0)
-        self.right_bottom_frame = tk.Frame(bottom_frame, width=self.window_width/2, height=self.window_height/2)
-        self.right_bottom_frame.place(x=self.window_width/2,y=0)
+        self.right_bottom_frame = tk.Frame(bottom_frame, width=self.window_width/2, height=self.window_height/2, padx=10, pady=10)
+        self.right_bottom_frame.place(x=self.window_width//2,y=0)
         self.init_plots()
         #bottom frame
 
@@ -227,27 +227,29 @@ class DataApp:
         self.btn_import.place(x=10, y=20)
         self.btn_import.config(font=("Times New Roman", 10))
         # self.btn_load.pack(side="top", padx=5, pady=10)
-        self.btn_export = tk.Button(io_frame, text="Exportovat do .csv", command=self.save_file_dialogwindow)
+        self.btn_export = tk.Button(io_frame, text="Exportovat do .csv", command=self.save_spectrum_dialogwindow)
         self.btn_export.place(x=10, y=80)
         self.btn_export.config(font=("Times New Roman", 10))
-        #messagebox.showinfo(":)","Subor bol exportovany do .csv")
-    # zobrazenie navodu
-
 
     #inicializacia grafov (metoda)
     def init_plots(self):
-        px = 1 / plt.rcParams['figure.dpi'] # konvertuje palce na pixely
-        fig_width = (self.window_width / 2 - 2*50)*px #sirka grafu
-        fig_height = (self.window_height / 2 - 2*40)*px # vyska grafu
+        dpi = plt.rcParams['figure.dpi']
+        px = 1 / dpi # konvertuje pixelov na palce
+        available_w = (self.window_width // 2) - 2 * 10
+        available_h = self.frame_height - 2 * 10
+        fig_width = available_w * px #sirka grafu
+        fig_height = available_h * px # vyska grafu
 
-        self.fig_td = Figure(figsize=(fig_width,fig_height), dpi=100)
+        # casova domena
+        self.fig_td = Figure(figsize=(fig_width,fig_height), dpi=dpi, layout='constrained')
         self.ax_td = self.fig_td.add_subplot(111)
         self.ax_td.set_title("časová doména")
         self.fig_td.tight_layout()
         self.canvas_td = FigureCanvasTkAgg(self.fig_td, master=self.left_bottom_frame)
         self.canvas_td.get_tk_widget().pack(side="top", fill="both", expand=True)
 
-        self.fig_fd = Figure(figsize=(fig_width,fig_height), dpi=100)
+        # frekvencna domena
+        self.fig_fd = Figure(figsize=(fig_width,fig_height), dpi=dpi, layout='constrained')
         self.ax_fd = self.fig_fd.add_subplot(111)
         self.ax_fd.set_title("frekvenčná doména")
         self.fig_fd.tight_layout()
@@ -265,34 +267,59 @@ class DataApp:
             return
 
         try:
-            x_values = self.data.iloc[:, 0].values  # prvy riadok
-            y_values = self.data.iloc[:, 1].values
+            # Extrakcia hodnôt (neprepisujeme self.data!)
+            x_values = self.data.iloc[:, 0].values  # časová os
+            y_values = self.data.iloc[:, 1].values  # amplitúda
             n = len(y_values)
-            # 1. Aktualizacia grafu signalu
+
+            # Výpočet vzorkovacej frekvencie (predpokladáme rovnomerné vzorkovanie)
+            dt = x_values[1] - x_values[0]
+            fs = 1.0 / dt
+
+            # Vykreslenie časovej domény
             self.ax_td.clear()
-            self.ax_td.plot(x_values,y_values, color='blue')
+            self.ax_td.plot(x_values, y_values, color='blue')
             self.ax_td.set_title("Časová doména (Raw Signal)")
+            self.ax_td.set_xlabel("Čas [s]")
+            #self.fig_td.tight_layout()
             self.canvas_td.draw()
-            self.data = fft_alg.cooley_tukey(y_values)
 
+            # Výber algoritmu a meranie času
+            start_val = self.sel.get()
+            time_start = time.time()
+            if start_val == 0:
+                fft_res = fft_alg.cooley_tukey(y_values)
+            elif start_val == 1:
+                fft_res = fft_alg.prime_factor(y_values)
+            else:
+                fft_res = fft_alg.split_radix(y_values)
 
-            # 2. Calculate FFT (Frequency Domain)
-            # Using numpy for the calculation logic
+            time_end = time.time()
+            duration = time_end - time_start
 
-            fft_values = np.fft.fft(y_values)
-            fft_freq = np.fft.fftfreq(y_values)
+            # Aktualizácia políčka pre čas v UI
+            self.cas_okno.delete(0, tk.END)
+            self.cas_okno.insert(0, f"{duration:.6f} s")
 
-            # Get magnitudes (absolute values)
-            magnitudes = np.abs(fft_values)[:n // 2]
-            freqs = fft_freq[:n // 2]
+            # 3. Spracovanie výsledkov FFT pre graf
+            # Magnitúda (absolútna hodnota)
+            magnitudes = np.abs(fft_res)[:n // 2]
+            # Výpočet frekvenčnej osi (Hz)
+            freq_axis = np.linspace(0, fs / 2, len(magnitudes))
 
-
-            # 3. Update Frequency Domain Plot
+            # Vykreslenie frekvenčnej domény
             self.ax_fd.clear()
-            self.ax_fd.plot(freqs, magnitudes, color='red')
-            self.ax_fd.set_title("Frekvenčná doména (Magnitude)")
-
+            self.ax_fd.plot(freq_axis, magnitudes, color='red')
+            self.ax_fd.set_title("Frekvenčná doména (Amplitúdové spektrum)")
+            self.ax_fd.set_xlabel("Frekvencia [Hz]")
+            #self.fig_fd.tight_layout()
             self.canvas_fd.draw()
+
+            # extrahoanie dat z frekvencneho spektra
+            self.spectrum_data = pd.DataFrame({
+                'Frequency_Hz': freq_axis,
+                'Magnitude': magnitudes
+            })
 
         except Exception as e:
             messagebox.showerror("Error", f"Chyba pri spracovaní dát: {e}")

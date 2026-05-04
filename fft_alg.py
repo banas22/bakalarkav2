@@ -1,14 +1,9 @@
 from logging import exception
-from tkinter import messagebox
 import numpy as np
-import matplotlib.pyplot as plt
 from fontTools.misc.fixedTools import floatToFixedToStr
 from numpy import *
-import cmath
 import math
 from pyexpat.errors import messages
-from scipy.fft import fft
-import time
 
 def bit_reverse(n,pocet_bitov):# obrati indexy pola do noveho pola
     # prevod z 10 na 2 sustavu
@@ -21,7 +16,6 @@ def bit_reverse(n,pocet_bitov):# obrati indexy pola do noveho pola
     while i < len(v_2): # prevod z 2 na 10 LIFO
         ans += 2**(pocet_bitov-i-1) * v_2[i]
         i += 1
-
     return ans
 
 def twiddle_factor(prvok, pocet_prvkov):
@@ -57,7 +51,7 @@ def cooley_tukey(x): # hotovy a funkcny
     return x
 
 def nesudelitelne(a): # funkcny, vracia integer
-    for i in reversed(range(1, a // 2)):
+    for i in reversed( range( 2, int(math.sqrt(a)+1) ) ):
         if a % i != 0:
             continue
         # tvorba nesudelitelnych cisel
@@ -70,8 +64,15 @@ def nesudelitelne(a): # funkcny, vracia integer
 
 def dft(x):
     N = len(x)
-    X = np.zeros((N), dtype = complex)
+    X = np.zeros(N, dtype = complex)
     k = 0
+    if N == 1:
+        X[0] = x[0]
+        return X
+    if N == 2:
+        X[0] = x[0] + x[1]
+        X[1] = x[0] - x[1]
+        return X
     while k < N:
         n = 0
         while n < N:
@@ -82,7 +83,7 @@ def dft(x):
 
 def modInverse(a, m):
     for x in range(1, m):
-        if (((a % m) * (x % m)) % m == 1):
+        if ((a % m) * (x % m)) % m == 1:
             return x
     return 1
 
@@ -91,7 +92,6 @@ def prime_factor(x):
     N1 = nesudelitelne(N)  # Ensure N1 and N2 are coprime
     N2 = N // N1
     # Good-Thomasovo mapovanie
-    # Cinska veta o zvyskoch
     X_mat = np.zeros((N1, N2), dtype=complex)
     for n in range(N):
         X_mat[n % N1][n % N2] = x[n]
