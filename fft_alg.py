@@ -41,14 +41,15 @@ def butterfly(butterfly_matrix, N): # funkcny
 def cooley_tukey(x): # hotovy a funkcny
     N = len(x)  # pocet prvkov je definovany dlzkou vstupneho pola
     if math.log2(N) % 1 != 0:
-        raise IndexError("Neplatny pocet vzoriek")
+        raise IndexError("Neplatný počet vzoriek")
     pocet_faz = int(math.log2(N))  # pocet faz v butterfly diagrame k=log2(n)
     butterfly_matrix = np.zeros((pocet_faz + 1, N), dtype=complex)
 
     for i in range(N): # prevracanie indexovych bitov na vzorkach
         butterfly_matrix[0][i] = x[bit_reverse(i, pocet_faz)]
-    x = butterfly(butterfly_matrix, N)
-    return x
+
+    X = butterfly(butterfly_matrix, N)
+    return X
 
 def nesudelitelne(a): # funkcny, vracia integer
     for i in reversed( range( 2, int(math.sqrt(a)+1) ) ):
