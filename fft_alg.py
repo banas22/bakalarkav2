@@ -125,6 +125,10 @@ def prime_factor(x):
         for k2 in range(N2):
             index = (k1 * s1 + k2 * s2) % N
             X[index] = X_mat[k1][k2]
+
+    m_perm = (N1 + N2) % N
+    m_inv = modInverse(m_perm, N)
+    X = X[(m_inv * np.arange(N)) % N]
     return X, adds, mults
 
 def split_radix(x):

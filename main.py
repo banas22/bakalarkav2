@@ -177,11 +177,11 @@ class DataApp:
 
         # Vyber FFT algoritmu
         self.sel = tk.IntVar(value=0)  # Jedna premenná pre Radiobuttony
-        radio_btn1 = tk.Radiobutton(top_frame, variable=self.sel, text="Cooley-Tukey", value=0, bg="lightblue")
+        radio_btn1 = tk.Radiobutton(top_frame, variable=self.sel, text="Cooley-Tukey", value=0, bg="lightblue", command=self.update_plots)
         radio_btn1.place(x=int(20*self.scale), y=int(50*self.scale))
-        radio_btn2 = tk.Radiobutton(top_frame, variable=self.sel, text="Prime Factor", value=1, bg="lightblue")
+        radio_btn2 = tk.Radiobutton(top_frame, variable=self.sel, text="Prime Factor", value=1, bg="lightblue", command=self.update_plots)
         radio_btn2.place(x=int(20*self.scale), y=int(80*self.scale))
-        radio_btn3 = tk.Radiobutton(top_frame, variable=self.sel, text="Split Radix", value=2, bg="lightblue")
+        radio_btn3 = tk.Radiobutton(top_frame, variable=self.sel, text="Split Radix", value=2, bg="lightblue", command=self.update_plots)
         radio_btn3.place(x=int(20*self.scale), y=int(110*self.scale))
         # zobrazenie metrik
         self.cas_popis = Label(top_frame, text="Čas programu:")
@@ -189,11 +189,21 @@ class DataApp:
         self.cas_okno = Entry(top_frame)
         self.cas_okno.place(x=int(150*self.scale), y=int(200*self.scale))
         self.cas_okno.config(state=tk.DISABLED)
+        self.add_popis = Label(top_frame, text="Sčítania:")
+        self.add_popis.place(x=int(380 * self.scale), y=int(200 * self.scale))
+        self.add_okno = Entry(top_frame)
+        self.add_okno.place(x=int(480 * self.scale), y=int(200 * self.scale))
+        self.add_okno.config(state=tk.DISABLED)
         self.opakovania_popis = Label(top_frame, text="Počet opakovaní:")
         self.opakovania_popis.place(x=int(10*self.scale), y=int(240*self.scale))
         self.opakovania_okno = Entry(top_frame)
         self.opakovania_okno.place(x=int(150*self.scale), y=int(240*self.scale))
         self.opakovania_okno.config(state=tk.DISABLED)
+        self.mult_popis = Label(top_frame, text="Násobenia:")
+        self.mult_popis.place(x=int(380 * self.scale), y=int(240 * self.scale))
+        self.mult_okno = Entry(top_frame)
+        self.mult_okno.place(x=int(480 * self.scale), y=int(240 * self.scale))
+        self.mult_okno.config(state=tk.DISABLED)
 
         # button spustenie vybraneho algoritmu
         btn_inst = tk.Button(top_frame, text="Spustiť", command=self.update_plots)
@@ -260,7 +270,7 @@ class DataApp:
         # casova domena
         self.fig_td = Figure(figsize=(1, 1), dpi=dpi)
         self.ax_td = self.fig_td.add_subplot(111)
-        self.ax_td.set_xlabel("Čas")
+        self.ax_td.set_xlabel("Čas [s]")
         self.ax_td.set_ylabel("Amplitúda")
         self.ax_td.set_title("Časová doména")
         self.canvas_td = FigureCanvasTkAgg(self.fig_td, master=self.left_bottom_frame)
@@ -269,7 +279,7 @@ class DataApp:
         # frekvencna domena
         self.fig_fd = Figure(figsize=(1, 1), dpi=dpi)
         self.ax_fd = self.fig_fd.add_subplot(111)
-        self.ax_fd.set_xlabel("Frekvencia")
+        self.ax_fd.set_xlabel("Frekvencia [Hz]")
         self.ax_fd.set_ylabel("Magnitúda")
         self.ax_fd.set_title("Frekvenčná doména")
         self.canvas_fd = FigureCanvasTkAgg(self.fig_fd, master=self.right_bottom_frame)
@@ -297,40 +307,83 @@ class DataApp:
             # Vykreslenie časovej domény
             self.ax_td.clear()
             self.ax_td.plot(x_values, y_values, color='lightblue')
-            self.ax_td.set_title("Časová doména (Raw Signal)")
+            self.ax_td.set_title("Časová doména")
             self.ax_td.set_xlabel("Čas [s]")
-            #self.fig_td.tight_layout()
+            self.ax_td.set_ylabel("Amplitúda")
             self.canvas_td.draw()
 
             # Výber algoritmu a meranie času
             start_val = self.sel.get()
+
+            def next_pow2(m):
+                # najbližšia mocnina 2 >= m
+                return 1 << (m - 1).bit_length() if m > 1 else 1
+
+            def next_multiple(m, k):
+                # najbližší násobok k >= m
+                return ((m + k - 1) // k) * k if m > 0 else k
+
+            def next_prime_factor_len(m):
+                """Najbližšie N >= m, ktoré má aspoň jeden rozklad N=a*b,
+                kde a>1, b>1 a gcd(a,b)=1 (podmienka pre Prime Factor)."""
+                N = max(2, m)
+                while True:
+                    root = int(math.isqrt(N))
+                    for a in range(2, root + 1):
+                        if N % a == 0:
+                            b = N // a
+                            if math.gcd(a, b) == 1:
+                                return N
+                    N += 1
+
+            if start_val == 0:
+                # Cooley–Tukey: 2^k
+                n_fft = next_pow2(n)
+            elif start_val == 1:
+                # Prime Factor: N = N1*N2, gcd(N1, N2) = 1
+                n_fft = next_prime_factor_len(n)
+            else:
+                # Split-Radix: N = 4*k
+                n_fft = next_multiple(n, 4)
+
+
+
+            y_fft = np.pad(y_values, (0, n_fft - n), mode='constant') if n_fft != n else y_values
+
             time_start = time.time()
             if start_val == 0:
-                fft_res = fft_alg.cooley_tukey(y_values)
+                fft_res, adds, mults = fft_alg.cooley_tukey(y_fft)
             elif start_val == 1:
-                fft_res = fft_alg.prime_factor(y_values)
+                fft_res, adds, mults = fft_alg.prime_factor(y_fft)
             else:
-                fft_res = fft_alg.split_radix(y_values)
+                fft_res, adds, mults = fft_alg.split_radix(y_fft)
 
             time_end = time.time()
             duration = time_end - time_start
 
-            # Aktualizácia políčka pre čas v UI
-            self.cas_okno.delete(0, tk.END)
-            self.cas_okno.insert(0, f"{duration:.6f} s")
+            def update_field(entry, value):
+                entry.config(state=tk.NORMAL)
+                entry.delete(0, tk.END)
+                entry.insert(0, value)
+                entry.config(state=tk.DISABLED)
+
+            update_field(self.cas_okno, f"{duration:.6f} s")
+            update_field(self.add_okno, str(adds))
+            update_field(self.mult_okno, str(mults))
+
 
             # 3. Spracovanie výsledkov FFT pre graf
             # Magnitúda (absolútna hodnota)
-            magnitudes = np.abs(fft_res)[:n // 2]
+            magnitudes = np.abs(fft_res)[:n_fft // 2]
             # Výpočet frekvenčnej osi (Hz)
             freq_axis = np.linspace(0, fs / 2, len(magnitudes))
 
             # Vykreslenie frekvenčnej domény
             self.ax_fd.clear()
             self.ax_fd.plot(freq_axis, magnitudes, color='red')
-            self.ax_fd.set_title("Frekvenčná doména (Amplitúdové spektrum)")
+            self.ax_fd.set_title("Frekvenčná doména")
             self.ax_fd.set_xlabel("Frekvencia [Hz]")
-            #self.fig_fd.tight_layout()
+            self.ax_fd.set_ylabel("Magnitúda")
             self.canvas_fd.draw()
 
             # extrahoanie dat z frekvencneho spektra
