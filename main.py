@@ -206,11 +206,12 @@ class DataApp:
         io_frame.place(x=self.window_width - self.io_frame_width - int(20*self.scale), y=int(20*self.scale))
 
         #bottom frame
-        #buttom_frame = tk.Frame(self.root, padx=10, pady=10, bg="darkblue")
-        self.left_bottom_frame = tk.Frame(bottom_frame, width=self.window_width//2, height=self.window_height//2, padx=int(10*self.scale), pady=int(10*self.scale))
-        self.left_bottom_frame.place(x=0,y=0)
-        self.right_bottom_frame = tk.Frame(bottom_frame, width=self.window_width//2, height=self.window_height//2, padx=int(10*self.scale), pady=int(10*self.scale))
-        self.right_bottom_frame.place(x=self.window_width//2,y=0)
+        self.left_bottom_frame = tk.Frame(bottom_frame, width=self.window_width//2, height=self.frame_height)
+        self.left_bottom_frame.place(x=0, y=0)
+        self.left_bottom_frame.pack_propagate(False)
+        self.right_bottom_frame = tk.Frame(bottom_frame, width=self.window_width//2, height=self.frame_height)
+        self.right_bottom_frame.place(x=self.window_width//2, y=0)
+        self.right_bottom_frame.pack_propagate(False)
         self.init_plots()
         #bottom frame
 
@@ -223,39 +224,59 @@ class DataApp:
         self.btn_export.place(x=int(10*self.scale), y=int(80*self.scale))
         self.btn_export.config(font=("Times New Roman", int(10*self.scale)))
 
+    def _fit_plots(self):
+        """Runs once after the window is fully rendered. Queries actual frame
+        pixel sizes from tkinter and resizes matplotlib figures to match exactly,
+        so no manual DPI/scaling arithmetic is needed."""
+        for frame, fig, canvas in [
+            (self.left_bottom_frame, self.fig_td, self.canvas_td),
+            (self.right_bottom_frame, self.fig_fd, self.canvas_fd),
+        ]:
+            frame.update_idletasks()
+            w = frame.winfo_width()
+            h = frame.winfo_height()
+            if w > 10 and h > 10:
+                scale = 1  # how much of the frame the plot fills (lower = smaller)
+                fig.set_size_inches(w * scale / fig.get_dpi(), h * scale / fig.get_dpi())
+                fig.tight_layout()
+                canvas.draw()
+
     #inicializacia grafov (metoda)
     def init_plots(self):
-        #dpi = plt.rcParams['figure.dpi']
         dpi = self.dpi
-        px = 1 / dpi # konvertuje pixelov na palce
-        available_w = (self.window_width // 2) - 2 * int(10*self.scale)
-        available_h = self.frame_height - 2 * int(10*self.scale)
-        fig_width = available_w * px #sirka grafu
-        fig_height = available_h * px # vyska grafu
+
+        # Smaller text so labels/ticks don't dominate the plot area
+        plt.rcParams.update({
+            'font.size':        5,
+            'axes.titlesize':   5,
+            'axes.labelsize':   5,
+            'xtick.labelsize':  5,
+            'ytick.labelsize':  5,
+        })
+        # pack(fill="both", expand=True) then gives it the full frame.
+        # _fit_plots() is called via after() once layout is settled, and resizes
+        # the figure to the actual allocated frame size — no scaling guesswork.
 
         # casova domena
-        self.fig_td = Figure(figsize=(fig_width,fig_height), dpi=dpi, layout='constrained')
+        self.fig_td = Figure(figsize=(1, 1), dpi=dpi)
         self.ax_td = self.fig_td.add_subplot(111)
         self.ax_td.set_xlabel("Čas")
         self.ax_td.set_ylabel("Amplitúda")
         self.ax_td.set_title("Časová doména")
-        self.fig_td.tight_layout()
         self.canvas_td = FigureCanvasTkAgg(self.fig_td, master=self.left_bottom_frame)
         self.canvas_td.get_tk_widget().pack(side="top", fill="both", expand=True)
 
         # frekvencna domena
-        self.fig_fd = Figure(figsize=(fig_width,fig_height), dpi=dpi, layout='constrained')
+        self.fig_fd = Figure(figsize=(1, 1), dpi=dpi)
         self.ax_fd = self.fig_fd.add_subplot(111)
         self.ax_fd.set_xlabel("Frekvencia")
         self.ax_fd.set_ylabel("Magnitúda")
         self.ax_fd.set_title("Frekvenčná doména")
-        self.fig_fd.tight_layout()
         self.canvas_fd = FigureCanvasTkAgg(self.fig_fd, master=self.right_bottom_frame)
         self.canvas_fd.get_tk_widget().pack(side="top", fill="both", expand=True)
-        # xbod = np.array([])
-        # ybod = np.array([1,10])
-        # plt.plot(xbod, ybod, 'i')
-        # plt.show()
+
+        # Wait for the window to finish laying out, then fit figures to frames
+        self.root.after(150, self._fit_plots)
 
     #update grafov
     def update_plots(self):
