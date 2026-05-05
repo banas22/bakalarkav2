@@ -26,29 +26,29 @@ class DataApp:
     def open_ins(self):
         self.insa_window = tk.Toplevel(self.root)
         self.insa_window.title("Návod na používanie aplikácie")
-        self.insa_win_width = 400
-        self.insa_win_height = 400
+        self.insa_win_width = int(400*self.scale)
+        self.insa_win_height = int(400*self.scale)
         self.insa_window.geometry(str(self.insa_win_width) + "x" + str(self.insa_win_height))
         # frame
-        insm_frame = tk.Frame(self.insa_window, width=self.insa_win_width, height=self.insa_win_height, padx=10, pady=10, bg="blue")
+        insm_frame = tk.Frame(self.insa_window, width=self.insa_win_width, height=self.insa_win_height, padx=int(10*self.scale), pady=int(10*self.scale), bg="lightblue")
         insm_frame.place(x=0, y=0)
         in_lbl1 = Label(insm_frame, text="1. Importovať súbor vo formáte .csv")
-        in_lbl1.place(x=10, y=80)
+        in_lbl1.place(x=int(10*self.scale), y=int(80*self.scale))
         in_lbl2 = Label(insm_frame, text="2. Vybrať algoritmus")
-        in_lbl2.place(x=10, y=110)
+        in_lbl2.place(x=int(10*self.scale), y=int(110*self.scale))
         in_lbl3 = Label(insm_frame, text="3. Potvrdiť vyber")
-        in_lbl3.place(x=10, y=140)
+        in_lbl3.place(x=int(10*self.scale), y=int(140*self.scale))
         in_lbl4 = Label(insm_frame, text="4. Exportovať súbor")
-        in_lbl4.place(x=10, y=170)
+        in_lbl4.place(x=int(10*self.scale), y=int(170*self.scale))
 
     def open_alg_info(self):
         self.insb_window = tk.Toplevel(self.root)
         self.insb_window.title("Informácie o algoritmoch")
-        self.insb_win_width = 400
-        self.insb_win_height = 400
+        self.insb_win_width = int(400*self.scale)
+        self.insb_win_height = int(400*self.scale)
         self.insb_window.geometry(str(self.insb_win_width) + "x" + str(self.insb_win_height))
         # frame
-        insb_frame = tk.Frame(self.insb_window, width=self.insb_win_width, height=self.insb_win_height, padx=10, pady=10, bg="blue")
+        insb_frame = tk.Frame(self.insb_window, width=self.insb_win_width, height=self.insb_win_height, padx=int(10*self.scale), pady=int(10*self.scale), bg="lightblue")
         insb_frame.place(x=0, y=0)
         # rolovanie zoznamu
         scroll_bar = Scrollbar(insb_frame)
@@ -78,33 +78,33 @@ class DataApp:
         #definicia okna
         self.insm_window = tk.Toplevel(self.root)
         self.insm_window.title("Používateľská príručka")
-        self.insm_win_width = 400
-        self.insm_win_height = 300
+        self.insm_win_width = int(400*self.scale)
+        self.insm_win_height = int(300*self.scale)
         self.insm_window.geometry(str(self.insm_win_width)+"x"+str(self.insm_win_height))
         # frame
-        insm_frame = tk.Frame(self.insm_window,width=self.insm_win_width, height=self.insm_win_height, padx=10, pady=10, bg="blue")
+        insm_frame = tk.Frame(self.insm_window,width=self.insm_win_width, height=self.insm_win_height, padx=int(10*self.scale), pady=int(10*self.scale), bg="lightblue")
         insm_frame.place(x=0, y=0)
         # rozlozenie
         nadpis = Label(insm_frame, text="Vitajte v kalkulačke")
-        nadpis.config(font=("Times New Roman", 10))
-        nadpis.place(x=50, y=50)
+        nadpis.config(font=("Times New Roman", int(10*self.scale)))
+        nadpis.place(x=int(50*self.scale), y=int(50*self.scale))
         btn1 = Button(insm_frame, text="Návod", command=self.open_ins)
-        btn1.place(x=10, y=100)
+        btn1.place(x=int(10*self.scale), y=int(100*self.scale))
         btn2 = Button(insm_frame, text="Algoritmy", command=self.open_alg_info)
-        btn2.place(x=10, y=140)
+        btn2.place(x=int(10*self.scale), y=int(140*self.scale))
         btn3 = Button(insm_frame, text="Informácie", command=self.open_app_info)
-        btn3.place(x=10, y=180)
+        btn3.place(x=int(10*self.scale), y=int(180*self.scale))
 
     def easter_egg(self):
         self.cal_window = tk.Toplevel(self.root)
         self.cal_window.title("Je číslo 2^n")
         self.cal_window.geometry("300x300")
         self.lbl = tk.Label(self.cal_window, text="Zadajte prirodzené číslo")
-        self.lbl.config(font=("Times New Roman", 10))
-        self.lbl.place(x=10, y=50)
+        self.lbl.config(font=("Times New Roman", int(10*self.scale)))
+        self.lbl.place(x=int(10*self.scale), y=int(50*self.scale))
         self.t = tk.Text(self.cal_window)
-        self.t.config(font=("Times New Roman", 10), width=100, height=50)
-        self.t.place(x=10, y=50)
+        self.t.config(font=("Times New Roman", int(10*self.scale)), width=int(100*self.scale), height=int(50*self.scale))
+        self.t.place(x=int(10*self.scale), y=int(50*self.scale))
 
     # importuje subor
     def import_file_dialogwindow(self):
@@ -134,12 +134,17 @@ class DataApp:
 
     #konstruktor
     def __init__(self, root): #hlavne okno
+
+
         # vlastnosti okna
         self.insm_window = None
         self.cal_window = None
-        self.window_width = 1000 #width = sirka
-        self.window_height = 600 #height = vyska
         self.root = root
+        self.dpi = self.root.winfo_fpixels('1i')
+        self.scale = self.dpi/96
+        self.window_width = int(1000*self.scale) #width = sirka
+        self.window_height = int(600*self.scale) #height = vyska
+        self.root.tk.call('tk', 'scaling', 2.5)
         self.root.title("Výpočet FFT")
         self.root.geometry(str(self.window_width)+"x"+str(self.window_height))
         self.root.resizable(False, False)
@@ -159,7 +164,7 @@ class DataApp:
 
         #horny a dolny ramec
         self.frame_height = self.window_height//2
-        top_frame = tk.Frame(self.root, width=self.window_width, height=self.frame_height, padx=10, pady=10, bg="lightblue")
+        top_frame = tk.Frame(self.root, width=self.window_width, height=self.frame_height, padx=int(10*self.scale), pady=int(10*self.scale), bg="lightblue")
         top_frame.place(x=0,y=0)
         bottom_frame = tk.Frame(self.root, width=self.window_width, height=self.frame_height, padx=0, pady=0, bg="red")
         bottom_frame.place(x=0,y=self.frame_height)
@@ -167,63 +172,64 @@ class DataApp:
 
         #Nadpis
         label_radio = tk.Label(top_frame, text="Vyberte FFT algoritmus")
-        label_radio.place(x=20, y=20)
-        label_radio.config(font=("Times New Roman", 10))
+        label_radio.place(x=int(20*self.scale), y=int(20*self.scale))
+        label_radio.config(font=("Times New Roman", int(10*self.scale)))
 
         # Vyber FFT algoritmu
         self.sel = tk.IntVar(value=0)  # Jedna premenná pre Radiobuttony
         radio_btn1 = tk.Radiobutton(top_frame, variable=self.sel, text="Cooley-Tukey", value=0, bg="lightblue")
-        radio_btn1.place(x=20, y=50)
+        radio_btn1.place(x=int(20*self.scale), y=int(50*self.scale))
         radio_btn2 = tk.Radiobutton(top_frame, variable=self.sel, text="Prime Factor", value=1, bg="lightblue")
-        radio_btn2.place(x=20, y=80)
+        radio_btn2.place(x=int(20*self.scale), y=int(80*self.scale))
         radio_btn3 = tk.Radiobutton(top_frame, variable=self.sel, text="Split Radix", value=2, bg="lightblue")
-        radio_btn3.place(x=20, y=110)
+        radio_btn3.place(x=int(20*self.scale), y=int(110*self.scale))
         # zobrazenie metrik
         self.cas_popis = Label(top_frame, text="Čas programu:")
-        self.cas_popis.place(x=10, y=200)
+        self.cas_popis.place(x=int(10*self.scale), y=int(200*self.scale))
         self.cas_okno = Entry(top_frame)
-        self.cas_okno.place(x=150, y=200)
+        self.cas_okno.place(x=int(150*self.scale), y=int(200*self.scale))
         self.cas_okno.config(state=tk.DISABLED)
         self.opakovania_popis = Label(top_frame, text="Počet opakovaní:")
-        self.opakovania_popis.place(x=10, y=240)
+        self.opakovania_popis.place(x=int(10*self.scale), y=int(240*self.scale))
         self.opakovania_okno = Entry(top_frame)
-        self.opakovania_okno.place(x=150, y=240)
+        self.opakovania_okno.place(x=int(150*self.scale), y=int(240*self.scale))
         self.opakovania_okno.config(state=tk.DISABLED)
 
         # button spustenie vybraneho algoritmu
         btn_inst = tk.Button(top_frame, text="Spustiť", command=self.update_plots)
-        btn_inst.place(x=20, y=140)
+        btn_inst.place(x=int(20*self.scale), y=int(140*self.scale))
 
         # ramec pre import/export buttony
-        self.io_frame_width = 300
-        self.io_frame_height = 150
-        io_frame = tk.Frame(top_frame, width=self.io_frame_width, height=self.io_frame_height, padx=10, pady=10, bg="white")
-        io_frame.place(x=self.window_width - self.io_frame_width - 20, y=20)
+        self.io_frame_width = int(300*self.scale)
+        self.io_frame_height = int(150*self.scale)
+        io_frame = tk.Frame(top_frame, width=self.io_frame_width, height=self.io_frame_height, padx=int(10*self.scale), pady=int(10*self.scale), bg="white")
+        io_frame.place(x=self.window_width - self.io_frame_width - int(20*self.scale), y=int(20*self.scale))
 
         #bottom frame
         #buttom_frame = tk.Frame(self.root, padx=10, pady=10, bg="darkblue")
-        self.left_bottom_frame = tk.Frame(bottom_frame, width=self.window_width/2, height=self.window_height/2, padx=10, pady=10)
+        self.left_bottom_frame = tk.Frame(bottom_frame, width=self.window_width//2, height=self.window_height//2, padx=int(10*self.scale), pady=int(10*self.scale))
         self.left_bottom_frame.place(x=0,y=0)
-        self.right_bottom_frame = tk.Frame(bottom_frame, width=self.window_width/2, height=self.window_height/2, padx=10, pady=10)
+        self.right_bottom_frame = tk.Frame(bottom_frame, width=self.window_width//2, height=self.window_height//2, padx=int(10*self.scale), pady=int(10*self.scale))
         self.right_bottom_frame.place(x=self.window_width//2,y=0)
         self.init_plots()
         #bottom frame
 
         # import a export button, udaje FFT
         self.btn_import = tk.Button(io_frame, text="Importovať z .csv", command=self.import_file_dialogwindow)
-        self.btn_import.place(x=10, y=20)
-        self.btn_import.config(font=("Times New Roman", 10))
+        self.btn_import.place(x=int(10*self.scale), y=int(20*self.scale))
+        self.btn_import.config(font=("Times New Roman", int(10*self.scale)))
         # self.btn_load.pack(side="top", padx=5, pady=10)
         self.btn_export = tk.Button(io_frame, text="Exportovať do .csv", command=self.save_spectrum_dialogwindow)
-        self.btn_export.place(x=10, y=80)
-        self.btn_export.config(font=("Times New Roman", 10))
+        self.btn_export.place(x=int(10*self.scale), y=int(80*self.scale))
+        self.btn_export.config(font=("Times New Roman", int(10*self.scale)))
 
     #inicializacia grafov (metoda)
     def init_plots(self):
-        dpi = plt.rcParams['figure.dpi']
+        #dpi = plt.rcParams['figure.dpi']
+        dpi = self.dpi
         px = 1 / dpi # konvertuje pixelov na palce
-        available_w = (self.window_width // 2) - 2 * 10
-        available_h = self.frame_height - 2 * 10
+        available_w = (self.window_width // 2) - 2 * int(10*self.scale)
+        available_h = self.frame_height - 2 * int(10*self.scale)
         fig_width = available_w * px #sirka grafu
         fig_height = available_h * px # vyska grafu
 
@@ -269,7 +275,7 @@ class DataApp:
 
             # Vykreslenie časovej domény
             self.ax_td.clear()
-            self.ax_td.plot(x_values, y_values, color='blue')
+            self.ax_td.plot(x_values, y_values, color='lightblue')
             self.ax_td.set_title("Časová doména (Raw Signal)")
             self.ax_td.set_xlabel("Čas [s]")
             #self.fig_td.tight_layout()
