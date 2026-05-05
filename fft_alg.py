@@ -61,7 +61,7 @@ def nesudelitelne(a): # funkcny, vracia integer
 
         if math.gcd(c1, c2) == 1 and not (c1 == a or c2 == a):
             return int(c1)
-    raise IndexError("Neplatny pocet vzoriek")
+    raise IndexError("Neplatný počet vzoriek")
 
 def dft(x):
     N = len(x)
