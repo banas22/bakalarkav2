@@ -17,7 +17,6 @@ from tkinter import *
 from tkinter.ttk import *
 from time import strftime
 import pandas as pd
-from pandas import read_csv
 import fft_alg
 
 import time
@@ -26,25 +25,25 @@ import time
 class DataApp:
     def open_ins(self):
         self.insa_window = tk.Toplevel(self.root)
-        self.insa_window.title("Navod na pouzivanie aplikacie")
+        self.insa_window.title("Návod na používanie aplikácie")
         self.insa_win_width = 400
         self.insa_win_height = 400
         self.insa_window.geometry(str(self.insa_win_width) + "x" + str(self.insa_win_height))
         # frame
         insm_frame = tk.Frame(self.insa_window, width=self.insa_win_width, height=self.insa_win_height, padx=10, pady=10, bg="blue")
         insm_frame.place(x=0, y=0)
-        in_lbl1 = Label(insm_frame, text="1. Importovat subor vo formate .csv")
+        in_lbl1 = Label(insm_frame, text="1. Importovať súbor vo formáte .csv")
         in_lbl1.place(x=10, y=80)
-        in_lbl2 = Label(insm_frame, text="2. Vybrat algoritmus")
+        in_lbl2 = Label(insm_frame, text="2. Vybrať algoritmus")
         in_lbl2.place(x=10, y=110)
-        in_lbl3 = Label(insm_frame, text="3. Potvrdit vyber")
+        in_lbl3 = Label(insm_frame, text="3. Potvrdiť vyber")
         in_lbl3.place(x=10, y=140)
-        in_lbl4 = Label(insm_frame, text="4. Exportovat subor")
+        in_lbl4 = Label(insm_frame, text="4. Exportovať súbor")
         in_lbl4.place(x=10, y=170)
 
     def open_alg_info(self):
         self.insb_window = tk.Toplevel(self.root)
-        self.insb_window.title("Informacie o algoritmoch")
+        self.insb_window.title("Informácie o algoritmoch")
         self.insb_win_width = 400
         self.insb_win_height = 400
         self.insb_window.geometry(str(self.insb_win_width) + "x" + str(self.insb_win_height))
@@ -58,41 +57,27 @@ class DataApp:
         mylist = Listbox(insb_frame, yscrollcommand=scroll_bar.set)
         #
         mylist.insert(END, "Cooley-Tukey")
-        mylist.insert(END, "Pocet vzoriek: 2^n")
+        mylist.insert(END, "Počet vzoriek: 2^n")
         mylist.insert(END, "Cooley-Tukey")
         mylist.insert(END, " ")
-        mylist.insert(END, "Prime factor")
-        mylist.insert(END, "Pocet vzoriek: N = N1 * N2; N1 a N2 su nesudelitelne")
+        mylist.insert(END, "Prime Factor")
+        mylist.insert(END, "Počet vzoriek: N = N1 * N2; N1 a N2 sú nesúdeliteľné")
         mylist.insert(END, "Prime factor")
         mylist.insert(END, " ")
         mylist.insert(END, "Split Radix")
-        mylist.insert(END, "Pocet vzoriek: N = 4*n")
-        mylist.insert(END, "Cooley-Tukey")
+        mylist.insert(END, "Počet vzoriek: N = 4*n")
+        mylist.insert(END, "Split-Radix")
         mylist.pack(side=LEFT, fill=BOTH)
         scroll_bar.config(command=mylist.yview)
 
     def open_app_info(self):
-        self.insc_window = tk.Toplevel(self.root)
-        self.insc_window.title("Informacie o aplikacii")
-        self.insc_win_width = 400
-        self.insc_win_height = 400
-        self.insc_window.geometry(str(self.insc_win_width) + "x" + str(self.insc_win_height))
-        # frame
-        insc_frame = tk.Frame(self.insc_window, width=self.insc_win_width, height=self.insc_win_height, padx=10, pady=10, bg="blue")
-        insc_frame.place(x=0, y=0)
-        #
-        inf_label = tk.Label(insc_frame, text="Autori: Matus Banas a Ing.Dominik Cambal")
-        inf_label.place(x=10, y=50)
-        inf_label = tk.Label(insc_frame, text="Jazyk: Python 3.14.2")
-        inf_label.place(x=10, y=80)
-        inf_label = tk.Label(insc_frame, text="©2026")
-        inf_label.place(x=10, y=110)
+        messagebox.showinfo("Informácie o aplikácii", "Autori: Matúš Banáš a Ing. Dominik Čambál\nJazyk: Python 3.14.2\nPoužité externé balíky: Matplotlib, numpy, pandas\n©2026")
 
     # otvori navod na pouzivanie
     def open_instruction_window(self):
         #definicia okna
         self.insm_window = tk.Toplevel(self.root)
-        self.insm_window.title("Pouzivatelska prirucka")
+        self.insm_window.title("Používateľská príručka")
         self.insm_win_width = 400
         self.insm_win_height = 300
         self.insm_window.geometry(str(self.insm_win_width)+"x"+str(self.insm_win_height))
@@ -100,21 +85,21 @@ class DataApp:
         insm_frame = tk.Frame(self.insm_window,width=self.insm_win_width, height=self.insm_win_height, padx=10, pady=10, bg="blue")
         insm_frame.place(x=0, y=0)
         # rozlozenie
-        nadpis = Label(insm_frame, text="Vitajte v kalkulacke")
+        nadpis = Label(insm_frame, text="Vitajte v kalkulačke")
         nadpis.config(font=("Times New Roman", 10))
         nadpis.place(x=50, y=50)
-        btn1 = Button(insm_frame, text="Navod", command=self.open_ins)
+        btn1 = Button(insm_frame, text="Návod", command=self.open_ins)
         btn1.place(x=10, y=100)
         btn2 = Button(insm_frame, text="Algoritmy", command=self.open_alg_info)
         btn2.place(x=10, y=140)
-        btn3 = Button(insm_frame, text="Informacie", command=self.open_app_info)
+        btn3 = Button(insm_frame, text="Informácie", command=self.open_app_info)
         btn3.place(x=10, y=180)
 
     def easter_egg(self):
         self.cal_window = tk.Toplevel(self.root)
-        self.cal_window.title("Je cislo 2^n")
+        self.cal_window.title("Je číslo 2^n")
         self.cal_window.geometry("300x300")
-        self.lbl = tk.Label(self.cal_window, text="Zadajte prirodzene cislo")
+        self.lbl = tk.Label(self.cal_window, text="Zadajte prirodzené číslo")
         self.lbl.config(font=("Times New Roman", 10))
         self.lbl.place(x=10, y=50)
         self.t = tk.Text(self.cal_window)
@@ -145,7 +130,7 @@ class DataApp:
         if filepath:
             # Uložíme s hlavičkou, aby sme vedeli, čo je čo
             self.spectrum_data.to_csv(filepath, index=False)
-            messagebox.showinfo("Úspech", "Frekvenčné spektrum bolo uložené.")
+            messagebox.showinfo("Info", "Frekvenčné spektrum bolo uložené.")
 
     #konstruktor
     def __init__(self, root): #hlavne okno
@@ -155,7 +140,7 @@ class DataApp:
         self.window_width = 1000 #width = sirka
         self.window_height = 600 #height = vyska
         self.root = root
-        self.root.title("Vypocet FFT")
+        self.root.title("Výpočet FFT")
         self.root.geometry(str(self.window_width)+"x"+str(self.window_height))
         self.root.resizable(False, False)
 
@@ -166,8 +151,8 @@ class DataApp:
         #menu
         menubar = Menu(root)
         navody = Menu(menubar, tearoff=0)
-        menubar.add_cascade(label='Navody', menu=navody)
-        navody.add_command(label = "Navod", command=self.open_instruction_window)
+        menubar.add_cascade(label='Návody', menu=navody)
+        navody.add_command(label = "Návod", command=self.open_instruction_window)
         navody.add_command(label = "2^n", command=self.easter_egg)
         self.root.config(menu=menubar)
         #
@@ -194,17 +179,19 @@ class DataApp:
         radio_btn3 = tk.Radiobutton(top_frame, variable=self.sel, text="Split Radix", value=2, bg="lightblue")
         radio_btn3.place(x=20, y=110)
         # zobrazenie metrik
-        self.cas_popis = Label(top_frame, text="Cas programu:")
+        self.cas_popis = Label(top_frame, text="Čas programu:")
         self.cas_popis.place(x=10, y=200)
         self.cas_okno = Entry(top_frame)
         self.cas_okno.place(x=150, y=200)
-        self.opakovania_popis = Label(top_frame, text="Pocet opakovani:")
+        self.cas_okno.config(state=tk.DISABLED)
+        self.opakovania_popis = Label(top_frame, text="Počet opakovaní:")
         self.opakovania_popis.place(x=10, y=240)
         self.opakovania_okno = Entry(top_frame)
         self.opakovania_okno.place(x=150, y=240)
+        self.opakovania_okno.config(state=tk.DISABLED)
 
         # button spustenie vybraneho algoritmu
-        btn_inst = tk.Button(top_frame, text="Spustit", command=self.update_plots)
+        btn_inst = tk.Button(top_frame, text="Spustiť", command=self.update_plots)
         btn_inst.place(x=20, y=140)
 
         # ramec pre import/export buttony
@@ -223,11 +210,11 @@ class DataApp:
         #bottom frame
 
         # import a export button, udaje FFT
-        self.btn_import = tk.Button(io_frame, text="Importovat z .csv", command=self.import_file_dialogwindow)
+        self.btn_import = tk.Button(io_frame, text="Importovať z .csv", command=self.import_file_dialogwindow)
         self.btn_import.place(x=10, y=20)
         self.btn_import.config(font=("Times New Roman", 10))
         # self.btn_load.pack(side="top", padx=5, pady=10)
-        self.btn_export = tk.Button(io_frame, text="Exportovat do .csv", command=self.save_spectrum_dialogwindow)
+        self.btn_export = tk.Button(io_frame, text="Exportovať do .csv", command=self.save_spectrum_dialogwindow)
         self.btn_export.place(x=10, y=80)
         self.btn_export.config(font=("Times New Roman", 10))
 
@@ -243,7 +230,9 @@ class DataApp:
         # casova domena
         self.fig_td = Figure(figsize=(fig_width,fig_height), dpi=dpi, layout='constrained')
         self.ax_td = self.fig_td.add_subplot(111)
-        self.ax_td.set_title("časová doména")
+        self.ax_td.set_xlabel("Čas")
+        self.ax_td.set_ylabel("Amplitúda")
+        self.ax_td.set_title("Časová doména")
         self.fig_td.tight_layout()
         self.canvas_td = FigureCanvasTkAgg(self.fig_td, master=self.left_bottom_frame)
         self.canvas_td.get_tk_widget().pack(side="top", fill="both", expand=True)
@@ -251,7 +240,9 @@ class DataApp:
         # frekvencna domena
         self.fig_fd = Figure(figsize=(fig_width,fig_height), dpi=dpi, layout='constrained')
         self.ax_fd = self.fig_fd.add_subplot(111)
-        self.ax_fd.set_title("frekvenčná doména")
+        self.ax_fd.set_xlabel("Frekvencia")
+        self.ax_fd.set_ylabel("Magnitúda")
+        self.ax_fd.set_title("Frekvenčná doména")
         self.fig_fd.tight_layout()
         self.canvas_fd = FigureCanvasTkAgg(self.fig_fd, master=self.right_bottom_frame)
         self.canvas_fd.get_tk_widget().pack(side="top", fill="both", expand=True)
@@ -263,7 +254,7 @@ class DataApp:
     #update grafov
     def update_plots(self):
         if self.data is None:
-            messagebox.showwarning("Warning", "Najprv importujte CSV súbor!")
+            messagebox.showwarning("Varovanie", "Najprv importujte CSV súbor!")
             return
 
         try:
