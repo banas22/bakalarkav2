@@ -168,26 +168,3 @@ def split_radix(x):
         adds += 6
         mults += 4
     return X, adds, mults
-
-'''if __name__ == "__main__":
-    x = np.array([4,5,7,8,0,1,9,8,2,1,5,4,6,2,4,5]) # pokusne pole
-    print(x) # vypis pola
-    print(fft(x))
-    try:
-        print("Cooley_Tukey: ")
-        print(cooley_tukey(x))
-    except BaseException: print("CHYBA \n Pocet vzoriek nie je transformovatelny algoritmom Cooley-Tukey")
-    print("Vypocitane podla vstavanej funkcie: ")
-
-    try:
-        pokusne_pole = prime_factor(x)
-        print(pokusne_pole)
-    except BaseException: print("Pocet pvkov nie je pocitatelny  Prime Factorom")
-
-    pokusne_pole = prime_factor(x)
-    print(pokusne_pole)
-
-    z = split_radix(x)
-    print("Split-Radix:")
-    print(z)
-'''

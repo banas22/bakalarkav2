@@ -32,14 +32,22 @@ class DataApp:
         # frame
         insm_frame = tk.Frame(self.insa_window, width=self.insa_win_width, height=self.insa_win_height, padx=int(10*self.scale), pady=int(10*self.scale), bg="lightblue")
         insm_frame.place(x=0, y=0)
+
+        in_lbl_m = Label(insm_frame, text="Návod na použitie")
+        in_lbl_m.place(x=int(10*self.scale), y=int(30*self.scale))
         in_lbl1 = Label(insm_frame, text="1. Importovať súbor vo formáte .csv")
         in_lbl1.place(x=int(10*self.scale), y=int(80*self.scale))
         in_lbl2 = Label(insm_frame, text="2. Vybrať algoritmus")
         in_lbl2.place(x=int(10*self.scale), y=int(110*self.scale))
-        in_lbl3 = Label(insm_frame, text="3. Potvrdiť vyber")
+        in_lbl3 = Label(insm_frame, text="3. Exportovať frekvenčné spektrum")
         in_lbl3.place(x=int(10*self.scale), y=int(140*self.scale))
-        in_lbl4 = Label(insm_frame, text="4. Exportovať súbor")
-        in_lbl4.place(x=int(10*self.scale), y=int(170*self.scale))
+
+        in_lbl_file = Label(insm_frame, text="Usporiadanie signálu v súbore .csv")
+        in_lbl_file.place(x=int(10*self.scale), y=int(230*self.scale))
+        in_lbl_file1 = Label(insm_frame, text="Prvý stĺpec je pre čas odobrania danej vzorky")
+        in_lbl_file1.place(x=int(10 * self.scale), y=int(270 * self.scale))
+        in_lbl_file2 = Label(insm_frame, text="Druhý stĺpec je pre amplitúdu vzorky v čase")
+        in_lbl_file2.place(x=int(10 * self.scale), y=int(300 * self.scale))
 
     def open_alg_info(self):
         self.insb_window = tk.Toplevel(self.root)
@@ -50,22 +58,29 @@ class DataApp:
         # frame
         insb_frame = tk.Frame(self.insb_window, width=self.insb_win_width, height=self.insb_win_height, padx=int(10*self.scale), pady=int(10*self.scale), bg="lightblue")
         insb_frame.place(x=0, y=0)
+        # nadpis
+        lbl_nadpis = Label(insb_frame, text="Kalkulačka slúži na výpočet frekvenčného spektra vzorkovaného signálu rýchlou Fourieroveou transformácoiu")
+        lbl_nadpis.place(x=int(10*self.scale), y=int(30*self.scale))
         # rolovanie zoznamu
         scroll_bar = Scrollbar(insb_frame)
         scroll_bar.pack(side=RIGHT,fill=Y)
         # info
         mylist = Listbox(insb_frame, yscrollcommand=scroll_bar.set)
+        mylist.place(x=int(10*self.scale), y=int(70*self.scale))
         #
         mylist.insert(END, "Cooley-Tukey")
-        mylist.insert(END, "Počet vzoriek: 2^n")
+        mylist.insert(END, "Počet vzoriek: N = 2^n")
+        mylist.insert(END, "Náročnosť: O = n log(n)")
         mylist.insert(END, "Cooley-Tukey")
         mylist.insert(END, " ")
         mylist.insert(END, "Prime Factor")
         mylist.insert(END, "Počet vzoriek: N = N1 * N2; N1 a N2 sú nesúdeliteľné")
+        mylist.insert(END, "Náročnosť: O = n log(n)")
         mylist.insert(END, "Prime factor")
         mylist.insert(END, " ")
         mylist.insert(END, "Split Radix")
         mylist.insert(END, "Počet vzoriek: N = 4*n")
+        mylist.insert(END, "Náročnosť: O = n log(n)")
         mylist.insert(END, "Split-Radix")
         mylist.pack(side=LEFT, fill=BOTH)
         scroll_bar.config(command=mylist.yview)
@@ -189,16 +204,16 @@ class DataApp:
         self.cas_okno = Entry(top_frame)
         self.cas_okno.place(x=int(150*self.scale), y=int(200*self.scale))
         self.cas_okno.config(state=tk.DISABLED)
+        self.mse_popis = Label(top_frame, text="Chyba (MSE):")
+        self.mse_popis.place(x=int(10 * self.scale), y=int(240 * self.scale))
+        self.mse_okno = Entry(top_frame)
+        self.mse_okno.place(x=int(150 * self.scale), y=int(240 * self.scale))
+        self.mse_okno.config(state=tk.DISABLED)
         self.add_popis = Label(top_frame, text="Sčítania:")
         self.add_popis.place(x=int(380 * self.scale), y=int(200 * self.scale))
         self.add_okno = Entry(top_frame)
         self.add_okno.place(x=int(480 * self.scale), y=int(200 * self.scale))
         self.add_okno.config(state=tk.DISABLED)
-        self.opakovania_popis = Label(top_frame, text="Počet opakovaní:")
-        self.opakovania_popis.place(x=int(10*self.scale), y=int(240*self.scale))
-        self.opakovania_okno = Entry(top_frame)
-        self.opakovania_okno.place(x=int(150*self.scale), y=int(240*self.scale))
-        self.opakovania_okno.config(state=tk.DISABLED)
         self.mult_popis = Label(top_frame, text="Násobenia:")
         self.mult_popis.place(x=int(380 * self.scale), y=int(240 * self.scale))
         self.mult_okno = Entry(top_frame)
@@ -361,6 +376,9 @@ class DataApp:
             time_end = time.time()
             duration = time_end - time_start
 
+            reconstructed_signal = np.fft.ifft(fft_res)
+            mse = np.mean(np.abs(y_fft - reconstructed_signal) ** 2)
+
             def update_field(entry, value):
                 entry.config(state=tk.NORMAL)
                 entry.delete(0, tk.END)
@@ -370,6 +388,7 @@ class DataApp:
             update_field(self.cas_okno, f"{duration:.6f} s")
             update_field(self.add_okno, str(adds))
             update_field(self.mult_okno, str(mults))
+            update_field(self.mse_okno, f"{mse:.2e}")
 
 
             # 3. Spracovanie výsledkov FFT pre graf
